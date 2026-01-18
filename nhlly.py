@@ -89,7 +89,8 @@ def get_goalies(team_abbrev):
             'player_id': player['playerId'],
             'games': player['gamesPlayed'],
             'wins': player['wins'],
-            'losses': player['losses'],
+            'losses': player
+            ['losses'],
             'otl': player['overtimeLosses'],
             'shutouts': player['shutouts'],
             'sv': player['savePercentage'],
@@ -105,15 +106,19 @@ def team_tui():
         subprocess.run(["clear"])
         skaters = get_skaters(team_abbrev)
         goalies = get_goalies(team_abbrev)
-        print(f" --- team roster {team_abbrev} ---")
-        print(f" {'Pos':<3} {'First Name':<10} {'Last Name':<13} {'Games'}")
-        print("-" * 35)
+        print(f" --- team roster {team_abbrev} --- Sort By: {sort_by}")
+        print("-" * 79)
+        print(f" {'Pos':<3} {'First Name':<10} {'Last Name':<13} {'GP':<4} {'G':<4} {'A':<4} {'P':<4} {'+/-':<5} {'PIM':<5} {'TOI':<12} {'FOW%':<10}")
+        print("-" * 79)
         sorted_skaters = sorted(skaters.items(), key=lambda x: x[1][sort_by], reverse=True)
         for name, stats in sorted_skaters:
-            print(f" {stats['position']:<3} {stats['first_name']:<10} {name:<13} {stats['games']}")
+            print(f" {stats['position']:<3} {stats['first_name']:<10} {name:<13} {stats['games']:<4} {stats['goals']:<4} {stats['assists']:<4} {stats['points']:<4} {stats['+/-']:<5} {stats['penalty_minutes']:<5} {stats['toi']:<12} {stats['faceoffWinPctg']:<10}")
         sorted_goalies = sorted(goalies.items(), key=lambda x: x[1][sort_by], reverse=True)
+        print("-" * 79)
+        print(f" {'Pos':<3} {'First Name':<10} {'Last Name':<13} {'GP':<4} {'W':<4} {'L':<4} {'OTL':<4} {'SO':<4} {'SV%':<10} {'GAA':<10}")
+        print("-" * 79)
         for name, stats in sorted_goalies:
-            print(f" {"G":<3} {stats['first_name']:<10} {name:<13} {stats['games']}")
+            print(f" {"G":<3} {stats['first_name']:<10} {name:<13} {stats['games']:<4} {stats['wins']:<4} {stats['losses']:<4} {stats['otl']:<4} {stats['shutouts']:<4} {stats['sv']:<10} {stats['gaa']:<10}")
         choice = input("Sort By: (f)irst name, (g)ames, (p)oints (q)uit").lower()
         match choice:
             case 'f':
@@ -126,6 +131,7 @@ def team_tui():
                 break
             case _:
                 print("Invalid input")
+                
 
 def main():
     """
