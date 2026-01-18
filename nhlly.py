@@ -66,6 +66,7 @@ def get_skaters(team_abbrev):
         player['lastName']['default']: {
             'first_name': player['firstName']['default'],
             'player_id': player['playerId'],
+            'position': player['positionCode'],
             'games': player['gamesPlayed'],
             'goals': player['goals'],
             'assists': player['assists'],
@@ -99,15 +100,32 @@ def get_goalies(team_abbrev):
 
 def team_tui():
     team_abbrev = input("What team: ").upper()
-    skaters = get_skaters(team_abbrev)
-    goalies = get_goalies(team_abbrev)
-    subprocess.run(["clear"])
-    sorted_skaters = sorted(skaters.items(), key=lambda x: x[1]['first_name'], reverse=True)
-    for name, stats in sorted_skaters:
-        print(f"{stats['first_name']:<12} [{name}]: {stats['games']}")
-    sorted_goalies = sorted(goalies.items(), key=lambda x: x[1]['first_name'], reverse=True)
-    for name, stats in sorted_goalies:
-        print(f"{stats['first_name']:<12} [{name}]: {stats['games']}")
+    sort_by = "first_name"
+    while True:
+        subprocess.run(["clear"])
+        skaters = get_skaters(team_abbrev)
+        goalies = get_goalies(team_abbrev)
+        print(f" --- team roster {team_abbrev} ---")
+        print(f" {'Pos':<3} {'First Name':<10} {'Last Name':<13} {'Games'}")
+        print("-" * 35)
+        sorted_skaters = sorted(skaters.items(), key=lambda x: x[1][sort_by], reverse=True)
+        for name, stats in sorted_skaters:
+            print(f" {stats['position']:<3} {stats['first_name']:<10} {name:<13} {stats['games']}")
+        sorted_goalies = sorted(goalies.items(), key=lambda x: x[1][sort_by], reverse=True)
+        for name, stats in sorted_goalies:
+            print(f" {"G":<3} {stats['first_name']:<10} {name:<13} {stats['games']}")
+        choice = input("Sort By: (f)irst name, (g)ames, (p)oints (q)uit").lower()
+        match choice:
+            case 'f':
+                sort_by = "first_name"
+            case 'g':
+                sort_by = "games"
+            case 'p':
+                sort_by = "points"
+            case 'q':
+                break
+            case _:
+                print("Invalid input")
 
 def main():
     """
