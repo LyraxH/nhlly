@@ -1,0 +1,7 @@
+api-web.nhle.com/v1
+
+/club-schedule-season/TOR/20252026
+/gamecenter/(year)(01-preaseason,02-regularseason,03-playoffs)(gamenumber)/(play-by-play)(boxscore)
+/player/playerid/landing
+/standings/now
+/club-stats/TOR/20252026
