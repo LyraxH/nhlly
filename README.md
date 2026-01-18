@@ -1,5 +1,5 @@
 # nhlly
- simple nhl stats grabber
+ Simple CLI based NHL stats puller application
 
 ## usage
    python nhlly.py
