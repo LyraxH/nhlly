@@ -41,17 +41,19 @@ def standings_tui():
             reverse = (sort_by != "name")
         )
         print(f"--- Standings --- Sort By: {sort_by}")
-        print(f"{"Division":<12} {"Team":<22} {"Points":<8} {"W":<4} {"L":<4} {"OTL":<4}")
+        print(f"{"Division":<14} {"":<4} {"Team":<22} {"Points":<8} {"W":<4} {"L":<4} {"OTL":<4}")
         print("-" * 69)
         for name, stats in sorted_list:
-            print(f"{stats['div']:<12} {name:<22} {stats['points']:<8} {stats['wins']:<4} {stats['losses']:<4} {stats['otl']:<4}")
-        choice = input("Sort By: (p)oints, (d)ivision, (t)eam, (q)uit").lower()
+            print(f"{stats['div']:<14} {stats['team_abbrev']:<4} {name:<22} {stats['points']:<8} {stats['wins']:<4} {stats['losses']:<4} {stats['otl']:<4}")
+        choice = input("Sort By: (p)oints, (d)ivision, (p)layoffs, (n)ame, (q)uit: ").lower()
         match choice:
             case 'p':
                 sort_by = "points"
             case 'd':
                 sort_by = "div"
-            case 't':
+            case 'p':
+                sort_by = "playoffs"
+            case 'n':
                 sort_by = "name"
             case 'q':
                 break
@@ -72,9 +74,9 @@ def get_skaters(team_abbrev):
             'assists': player['assists'],
             'points': player['points'],
             '+/-': player['plusMinus'],
-            'penalty_minutes': player['penaltyMinutes'],
+            'pim': player['penaltyMinutes'],
             'toi': player['avgTimeOnIcePerGame'],
-            'faceoffWinPctg': player['faceoffWinPctg']
+            'fow': player['faceoffWinPctg']
         }
         for player in data.get('skaters', [])
     }
@@ -89,8 +91,7 @@ def get_goalies(team_abbrev):
             'player_id': player['playerId'],
             'games': player['gamesPlayed'],
             'wins': player['wins'],
-            'losses': player
-            ['losses'],
+            'losses': player['losses'],
             'otl': player['overtimeLosses'],
             'shutouts': player['shutouts'],
             'sv': player['savePercentage'],
@@ -99,34 +100,49 @@ def get_goalies(team_abbrev):
         for player in data.get('goalies', [])
     }
 
-def team_tui():
+def roster_tui():
     team_abbrev = input("What team: ").upper()
-    sort_by = "first_name"
+    skater_sort_by = "first_name"
+    goalie_sort_by = "first_name"
     while True:
         subprocess.run(["clear"])
         skaters = get_skaters(team_abbrev)
         goalies = get_goalies(team_abbrev)
-        print(f" --- team roster {team_abbrev} --- Sort By: {sort_by}")
+        print(f" --- team roster {team_abbrev} --- Sort By: {skater_sort_by}")
         print("-" * 79)
-        print(f" {'Pos':<3} {'First Name':<10} {'Last Name':<13} {'GP':<4} {'G':<4} {'A':<4} {'P':<4} {'+/-':<5} {'PIM':<5} {'TOI':<12} {'FOW%':<10}")
+        print(f" {'Pos':<3} {'First Name':<10} {'Last Name':<13} {'GP':<4} {'G':<4} {'A':<4} {'P':<4} {'+/-':<5} {'PIM':<5} {'TOI':<5} {'FOW%':<10}")
         print("-" * 79)
-        sorted_skaters = sorted(skaters.items(), key=lambda x: x[1][sort_by], reverse=True)
+        sorted_skaters = sorted(skaters.items(), key=lambda x: x[1][skater_sort_by], reverse=True)
         for name, stats in sorted_skaters:
-            print(f" {stats['position']:<3} {stats['first_name']:<10} {name:<13} {stats['games']:<4} {stats['goals']:<4} {stats['assists']:<4} {stats['points']:<4} {stats['+/-']:<5} {stats['penalty_minutes']:<5} {stats['toi']:<12} {stats['faceoffWinPctg']:<10}")
-        sorted_goalies = sorted(goalies.items(), key=lambda x: x[1][sort_by], reverse=True)
+            print(f" {stats['position']:<3} {stats['first_name']:<10} {name:<13} {stats['games']:<4} {stats['goals']:<4} {stats['assists']:<4} {stats['points']:<4} {stats['+/-']:<5} {stats['pim']:<5} {(stats['toi']/60):<5.2f} {stats['fow']:<10}")
+        sorted_goalies = sorted(goalies.items(), key=lambda x: x[1][goalie_sort_by], reverse=True)
         print("-" * 79)
         print(f" {'Pos':<3} {'First Name':<10} {'Last Name':<13} {'GP':<4} {'W':<4} {'L':<4} {'OTL':<4} {'SO':<4} {'SV%':<10} {'GAA':<10}")
         print("-" * 79)
         for name, stats in sorted_goalies:
             print(f" {"G":<3} {stats['first_name']:<10} {name:<13} {stats['games']:<4} {stats['wins']:<4} {stats['losses']:<4} {stats['otl']:<4} {stats['shutouts']:<4} {stats['sv']:<10} {stats['gaa']:<10}")
-        choice = input("Sort By: (f)irst name, (g)ames, (p)oints (q)uit").lower()
+        choice = input("Sort By: (f)irst name, (g)ames, (p)oints, (+/-), (pim), (toi), (fow), (q)uit: ").lower()
         match choice:
             case 'f':
-                sort_by = "first_name"
+                skater_sort_by = "first_name"
+                goalie_sort_by = "first_name"
             case 'g':
-                sort_by = "games"
+                skater_sort_by = "games"
+                goalie_sort_by = "games"
             case 'p':
-                sort_by = "points"
+                skater_sort_by = "points"
+                goalie_sort_by = "shutouts"
+            case '+':
+                skater_sort_by = "+/-"
+                goalie_sort_by = "sv"
+            case 'pim':
+                skater_sort_by = "pim"
+            case 'toi':
+                skater_sort_by = "toi"
+                goalie_sort_by = "games"
+            case 'fow':
+                skater_sort_by = "faceoffWinPctg"
+                goalie_sort_by = "gaa"
             case 'q':
                 break
             case _:
@@ -138,12 +154,14 @@ def main():
     Main function for nhlly
     """
     while True:
-        user_input = input("(s)tandings (g)ames (t)eam (q)uit \n what do: ").lower()
+        user_input = input("(s)tandings (g)ames (t)eam (r)oster (q)uit \n what do: ").lower()
         match user_input:
             case 's':
                 standings_tui()
             case 'g':
                 get_games()
+            case 'r':
+                roster_tui()
             case 't':
                 team_tui()
             case 'q':
