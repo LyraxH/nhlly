@@ -6,6 +6,10 @@ import subprocess
 RESET = "\033[0m"
 
 def get_data(endpoint) -> dict:
+    """
+    Basic data fetching command
+    Used in conjunction with endpoint to fetch data from Official NHL API
+    """
     url = "https://api-web.nhle.com/v1/"
     r = requests.get(f"{url}{endpoint}")
     if r.status_code == 200:
@@ -13,7 +17,39 @@ def get_data(endpoint) -> dict:
     else:
         return {"error": "Could not retrieve data"}
 
+#region colors
+def get_colors(tricode):
+    """
+    Fetches colors for a given team from attached SQL database
+    """
+    path = "nhlly_data.db"
+    with sqlite3.connect(path) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT color_primary, color_secondary, color_accent, neutral_dark, neutral_light FROM colors WHERE tricode = ?", (tricode,))
+        row = cursor.fetchone()
+        if row:
+            primary, secondary, accent, neutral_dark, neutral_light = row
+            return primary, secondary, accent, neutral_dark, neutral_light
+        else:
+            print(f"Error: No colors found for {tricode}")
+            return None
+
+def colorize(hex):
+    """
+    Converts a hex color to an RGB color for use in the terminal
+    """
+    hex = hex.lstrip("#").upper()
+    r = int(hex[0:2], 16)
+    g = int(hex[2:4], 16)
+    b = int(hex[4:6], 16)
+    return f"\033[38;2;{r};{g};{b}m"
+#endregion colors
+
+#region standings
 def get_standings() -> dict | None:
+    """
+    Fetches standings data from Official NHL API
+    """
     data = get_data("standings/now")
     if not data or 'standings' not in data:
         return None
@@ -32,27 +68,6 @@ def get_standings() -> dict | None:
         }
         for team in data.get('standings', [])
     }
-
-def get_colors(tricode):
-    path = "nhlly_data.db"
-    with sqlite3.connect(path) as conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT color_primary, color_secondary, color_accent, neutral_dark, neutral_light FROM colors WHERE tricode = ?", (tricode,))
-        row = cursor.fetchone()
-        if row:
-            primary, secondary, accent, neutral_dark, neutral_light = row
-            return primary, secondary, accent, neutral_dark, neutral_light
-        else:
-            print(f"Error: No colors found for {tricode}")
-            return None
-
-def colorize(hex):
-    hex = hex.lstrip("#").upper()
-    r = int(hex[0:2], 16)
-    g = int(hex[2:4], 16)
-    b = int(hex[4:6], 16)
-    return f"\033[38;2;{r};{g};{b}m"
-    
 
 def standings_tui():
     sort_by = "points"
@@ -99,7 +114,13 @@ def standings_tui():
             case _:
                 print("Invalid input")
 
-def get_skaters(team_abbrev):
+#endregion standings
+
+#region rosters
+def get_skaters(team_abbrev) -> dict | None:
+    """
+    Fetches skater stats for a given team
+    """
     data = get_data(f"club-stats/{team_abbrev}/now")
     if not data or 'skaters' not in data:
         return None
@@ -120,7 +141,10 @@ def get_skaters(team_abbrev):
         for player in data.get('skaters', [])
     }
 
-def get_goalies(team_abbrev):
+def get_goalies(team_abbrev) -> dict | None:
+    """
+    Fetches goalie stats for a given team
+    """
     data = get_data(f"club-stats/{team_abbrev}/now")
     if not data or 'goalies' not in data:
         return None
@@ -181,13 +205,17 @@ def roster_tui():
                 skater_sort_by = "toi"
                 goalie_sort_by = "games"
             case 'fow':
-                skater_sort_by = "faceoffWinPctg"
+                skater_sort_by = "fow"
                 goalie_sort_by = "gaa"
             case 'q':
                 break
             case _:
                 print("Invalid input")
-                
+#endregion rosters           
+
+#region games
+
+#endregion games
 
 def main():
     """
