@@ -2,7 +2,7 @@ import subprocess
 from datetime import datetime, timedelta # Essential for date math
 from api_client import get_data
 from db import get_colors, colorize, RESET
-from game_center import view_gamecenter
+from game_center import game_view_tui
 
 def get_schedule(date_str):
     """
@@ -32,10 +32,10 @@ def calendar_tui():
             print(f"--- Games for {schedule['dayAbbrev']} {schedule['date']} ---")
             game_info = {}
             for i, game in enumerate(schedule['games'], start=1):
-                game_id = game['id']
+                game_id = game.get('id')
                 game_info[str(i)] = game_id
-                away = game['awayTeam']['abbrev']
-                home = game['homeTeam']['abbrev']
+                away = game.get('awayTeam', {}).get('abbrev', '')
+                home = game.get('homeTeam', {}).get('abbrev', '')
                 away_color_primary = get_colors(away, 1)
                 home_color_primary = get_colors(home, 1)
                 print(f"{i}. {colorize(away_color_primary)}{away}{RESET} @ {colorize(home_color_primary)}{home}{RESET}")
@@ -48,7 +48,7 @@ def calendar_tui():
             case 'q':
                 break
             case x if x in game_info:
-                view_gamecenter(game_info[x])
+                game_view_tui(game_info[x])
                 break
             case _:
                 print("Invalid input")

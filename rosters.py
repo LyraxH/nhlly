@@ -10,18 +10,18 @@ def get_skaters(team_abbrev) -> dict | None:
     if not data or 'skaters' not in data:
         return None
     return {
-        player['lastName']['default']: {
-            'first_name': player['firstName']['default'],
-            'player_id': player['playerId'],
-            'position': player['positionCode'],
-            'games': player['gamesPlayed'],
-            'goals': player['goals'],
-            'assists': player['assists'],
-            'points': player['points'],
-            '+/-': player['plusMinus'],
-            'pim': player['penaltyMinutes'],
-            'toi': player['avgTimeOnIcePerGame'],
-            'fow': player['faceoffWinPctg']
+        player.get('lastName', {}).get('default', ''): {
+            'first_name': player.get('firstName', {}).get('default', ''),
+            'player_id': player.get('playerId'),
+            'position': player.get('positionCode'),
+            'games': player.get('gamesPlayed'),
+            'goals': player.get('goals'),
+            'assists': player.get('assists'),
+            'points': player.get('points'),
+            '+/-': player.get('plusMinus'),
+            'pim': player.get('penaltyMinutes'),
+            'toi': player.get('avgTimeOnIcePerGame'),
+            'fow': player.get('faceoffWinPctg')
         }
         for player in data.get('skaters', [])
     }
@@ -34,16 +34,16 @@ def get_goalies(team_abbrev) -> dict | None:
     if not data or 'goalies' not in data:
         return None
     return {
-        player['lastName']['default']: {
-            'first_name': player['firstName']['default'],
-            'player_id': player['playerId'],
-            'games': player['gamesPlayed'],
-            'wins': player['wins'],
-            'losses': player['losses'],
-            'otl': player['overtimeLosses'],
-            'shutouts': player['shutouts'],
-            'sv': player['savePercentage'],
-            'gaa': player['goalsAgainstAverage']
+        player.get('lastName', {}).get('default', ''): {
+            'first_name': player.get('firstName', {}).get('default', ''),
+            'player_id': player.get('playerId'),
+            'games': player.get('gamesPlayed'),
+            'wins': player.get('wins'),
+            'losses': player.get('losses'),
+            'otl': player.get('overtimeLosses'),
+            'shutouts': player.get('shutouts'),
+            'sv': player.get('savePercentage'),
+            'gaa': player.get('goalsAgainstAverage')
         }
         for player in data.get('goalies', [])
     }

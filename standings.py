@@ -10,17 +10,17 @@ def get_standings() -> dict | None:
     if not data or 'standings' not in data:
         return None
     return {
-        team['teamName']['default']: {
-            'team_abbrev': team['teamAbbrev']['default'],
-            'points': team['points'],
-            'wins': team['wins'],
-            'losses': team['losses'],
-            'otl': team['otLosses'],
-            'conf': team['conferenceName'],
-            'conf_abbrev': team['conferenceAbbrev'],
-            'div': team['divisionName'],
-            'div_abbrev': team['divisionAbbrev'],
-            'abv': team['teamAbbrev']['default']
+        team.get('teamName', {}).get('default', ''): {
+            'team_abbrev': team.get('teamAbbrev', {}).get('default', ''),
+            'points': team.get('points'),
+            'wins': team.get('wins'),
+            'losses': team.get('losses'),
+            'otl': team.get('otLosses'),
+            'conf': team.get('conferenceName'),
+            'conf_abbrev': team.get('conferenceAbbrev'),
+            'div': team.get('divisionName'),
+            'div_abbrev': team.get('divisionAbbrev'),
+            'abv': team.get('teamAbbrev', {}).get('default', '')
         }
         for team in data.get('standings', [])
     }
