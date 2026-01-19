@@ -56,7 +56,7 @@ def roster_tui():
         subprocess.run(["clear"])
         skaters = get_skaters(team_abbrev)
         goalies = get_goalies(team_abbrev)
-        color_primary, color_secondary, color_accent, neutral_dark, neutral_light = get_colors(team_abbrev)
+        color_primary, color_secondary, color_accent, neutral_dark, neutral_light = get_colors(team_abbrev, 5)
         print(f" --- team roster {team_abbrev} --- Sort By: {skater_sort_by}")
         print(f"{colorize(color_primary)}-" * 79)
         print(f" {'Pos':<3} {'First Name':<10} {'Last Name':<13} {'GP':<4} {'G':<4} {'A':<4} {'P':<4} {'+/-':<5} {'PIM':<5} {'TOI':<5} {'FOW%':<10}")

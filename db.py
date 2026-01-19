@@ -2,7 +2,7 @@ import sqlite3
 
 RESET = "\033[0m"
 
-def get_colors(tricode):
+def get_colors(tricode, color_num):
     """
     Fetches colors for a given team from attached SQL database
     """
@@ -13,7 +13,17 @@ def get_colors(tricode):
         row = cursor.fetchone()
         if row:
             primary, secondary, accent, neutral_dark, neutral_light = row
-            return primary, secondary, accent, neutral_dark, neutral_light
+            match color_num:
+                case 1:
+                    return primary
+                case 2:
+                    return primary, secondary
+                case 3:
+                    return primary, secondary, accent
+                case 4:
+                    return primary, secondary, accent, neutral_dark
+                case 5:
+                    return primary, secondary, accent, neutral_dark, neutral_light
         else:
             print(f"Error: No colors found for {tricode}")
             return None

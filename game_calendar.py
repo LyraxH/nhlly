@@ -4,38 +4,41 @@ from api_client import get_data
 from db import get_colors, colorize, RESET
 from game_center import view_gamecenter
 
-def get_schedule_for_date(date_str):
+def get_schedule(date_str):
     """
     Fetches the schedule starting specifically at date_str
     """
-    data = get_data(f"schedule/{date_str}")
-    week = data.get('gameWeek', [])
+    week = get_data(f"schedule/{date_str}").get('gameWeek', [])
     if not week:
         return None
-    day_data = week[0] 
+    day = week[0]
+    game_id = day.get('games', [])[0].get('id')
     return {
-        'date': day_data.get('date'),
-        'games': day_data.get('games', [])
+        'date': day.get('date'),
+        'dayAbbrev': day.get('dayAbbrev'),
+        'games': day.get('games', []),
+        'game_id': game_id
     }
 
 def calendar_tui():
     current_date = datetime.now()
     while True:
-        date_str = current_date.strftime("%Y-%m-%d")
-        schedule = get_schedule_for_date(date_str)
+        date = current_date.strftime("%Y-%m-%d")
+        schedule = get_schedule(date)
         subprocess.run(["clear"])
         if not schedule or not schedule['games']:
-            print(f"--- No games scheduled for {date_str} ---")
+            print(f"--- No games scheduled for {date} ---")
         else:
-            print(f"--- Games for {schedule['date']} ---")
-            game_number = 0
-            for game in schedule['games']:
-                away_color_primary, away_color_secondary, away_color_accent, away_neutral_dark, away_neutral_light = get_colors(game['awayTeam']['abbrev'])
-                home_color_primary, home_color_secondary, home_color_accent, home_neutral_dark, home_neutral_light = get_colors(game['homeTeam']['abbrev'])
+            print(f"--- Games for {schedule['dayAbbrev']} {schedule['date']} ---")
+            game_info = {}
+            for i, game in enumerate(schedule['games'], start=1):
+                game_id = game['id']
+                game_info[str(i)] = game_id
                 away = game['awayTeam']['abbrev']
                 home = game['homeTeam']['abbrev']
-                print(f"{game_number}.  {colorize(away_color_primary)}{away}{RESET} @ {colorize(home_color_primary)}{home}{RESET}")
-                game_number += 1
+                away_color_primary = get_colors(away, 1)
+                home_color_primary = get_colors(home, 1)
+                print(f"{i}. {colorize(away_color_primary)}{away}{RESET} @ {colorize(home_color_primary)}{home}{RESET}")
         choice = input(f"{RESET}(y)esterday (t)omorrow (#)View Game (q)uit: ").lower()
         match choice:
             case 't':
@@ -44,7 +47,8 @@ def calendar_tui():
                 current_date -= timedelta(days=1)
             case 'q':
                 break
-            case x if x.isnumeric():
-                view_gamecenter(x)
+            case x if x in game_info:
+                view_gamecenter(game_info[x])
+                break
             case _:
                 print("Invalid input")

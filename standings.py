@@ -38,11 +38,11 @@ def standings_tui():
         for name, stats in sorted_list:
             match color_by:
                 case "name":
-                    color_primary, color_secondary, color_accent, neutral_dark, neutral_light = get_colors(stats['team_abbrev'])
+                    color_primary, color_secondary, color_accent, neutral_dark, neutral_light = get_colors(stats['team_abbrev'], 5)
                 case "div":
-                    color_primary, color_secondary, color_accent, neutral_dark, neutral_light = get_colors(stats['div_abbrev'])
+                    color_primary, color_secondary, color_accent, neutral_dark, neutral_light = get_colors(stats['div_abbrev'], 5)
                 case "conf":
-                    color_primary, color_secondary, color_accent, neutral_dark, neutral_light = get_colors(stats['conf_abbrev'])
+                    color_primary, color_secondary, color_accent, neutral_dark, neutral_light = get_colors(stats['conf_abbrev'], 5)
                 case "playoffs":
                     color_primary, color_secondary, color_accent, neutral_dark, neutral_light = "", "", "", "", ""
 
