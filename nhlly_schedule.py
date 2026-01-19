@@ -1,8 +1,8 @@
 import subprocess
 from datetime import datetime, timedelta # Essential for date math
-from api_client import get_data
-from db import get_colors, colorize, RESET
-from game_center import game_view_tui
+from nhlly_api_client import get_data
+from nhlly_db import get_colors, colorize, RESET
+from nhlly_gamecenter import game_view_tui
 
 def get_schedule(date_str):
     """
@@ -20,7 +20,11 @@ def get_schedule(date_str):
         'game_id': game_id
     }
 
-def calendar_tui():
+def check_live(game_id):
+    data = get_data(f"gamecenter/{game_id}/landing")
+    return data.get('gameState')
+
+def schedule_tui():
     current_date = datetime.now()
     while True:
         date = current_date.strftime("%Y-%m-%d")
@@ -38,7 +42,8 @@ def calendar_tui():
                 home = game.get('homeTeam', {}).get('abbrev', '')
                 away_color_primary = get_colors(away, 1)
                 home_color_primary = get_colors(home, 1)
-                print(f"{i}. {colorize(away_color_primary)}{away}{RESET} @ {colorize(home_color_primary)}{home}{RESET}")
+                print(f"{i}. {colorize(away_color_primary)}{away}{RESET} @ {colorize(home_color_primary)}{home}{RESET}") #{check_live(game_id)}
+                #add if game is currently going NOW with lightweight API
         choice = input(f"{RESET}(y)esterday (t)omorrow (#)View Game (q)uit: ").lower()
         match choice:
             case 't':
@@ -47,7 +52,7 @@ def calendar_tui():
                 current_date -= timedelta(days=1)
             case 'q':
                 break
-            case x if x in game_info:
+            case x if x in game_info: #advanced stats
                 game_view_tui(game_info[x])
                 break
             case _:
