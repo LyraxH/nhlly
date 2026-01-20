@@ -106,32 +106,32 @@ def stats_tui(home, away, h_tag, a_tag):
     defense_sort_by = "name"
     while True:
         subprocess.run(["clear"])
-        primary, secondary, accent, light, dark = get_colors(toggle_tag, 5)
+        light, dark, accent = get_colors(toggle_tag, 3)
         sorted_forwards = sorted(toggle_team.get('forwards', []), key=lambda x: x[forward_sort_by], reverse=True)
         sorted_defense = sorted(toggle_team.get('defense', []), key=lambda x: x[defense_sort_by], reverse=True)
         sorted_goalies = sorted(toggle_team.get('goalies', []), key=lambda x: x['save_pctg'], reverse=True)
 
-        print(f"{colorize(primary)}------ {colorize(accent)} {toggle_tag} {colorize(primary)} ------ {colorize(light)}\nSort By: {forward_sort_by}{RESET}")
-        print(f"{colorize(secondary)}{"-" * 79}{RESET}")
+        print(f"{colorize(light)}------ {colorize(accent)} {toggle_tag} {colorize(light)} ------ {colorize(dark)}\nSort By: {forward_sort_by}{RESET}")
+        print(f"{colorize(dark)}{"-" * 79}{RESET}")
 
-        print(f" {colorize(primary)}{'Pos':<4}{'Name':<20}{'G':<4}{'A':<4}{'P':<4}{'+/-':<5}{'PIM':<5}{'TOI':<7}{'FOW%':<10}{RESET}")
-        print(f"{colorize(secondary)}{"-" * 79}{RESET}")
+        print(f" {colorize(light)}{'Pos':<4}{'Name':<20}{'G':<4}{'A':<4}{'P':<4}{'+/-':<5}{'PIM':<5}{'TOI':<7}{'FOW%':<10}{RESET}")
+        print(f"{colorize(dark)}{"-" * 79}{RESET}")
         for forward in sorted_forwards:
             print(f" {colorize(light)}{forward.get('position', ''):<4}{forward.get('name', ''):<20}{forward.get('goals', 0):<4}{forward.get('assists', 0):<4}{forward.get('points', 0):<4}{forward.get('+/-', 0):<5}{forward.get('pim', 0):<5}{forward.get('toi', 0):<7}{forward.get('fow', 0):<10.2f}{RESET}")
         
-        print(f"{colorize(secondary)}{"-" * 79}{RESET}")
+        print(f"{colorize(dark)}{"-" * 79}{RESET}")
 
         for defense in sorted_defense:
             print(f" {colorize(light)}{defense.get('position', ''):<4}{defense.get('name', ''):<20}{defense.get('goals', 0):<4}{defense.get('assists', 0):<4}{defense.get('points', 0):<4}{defense.get('+/-', 0):<5}{defense.get('pim', 0):<5}{defense.get('toi', 0):<7}{defense.get('fow', 0):<10.2f}{RESET}")
         
-        print(f"{colorize(secondary)}{"-" * 79}{RESET}")
+        print(f"{colorize(dark)}{"-" * 79}{RESET}")
 
-        print(f" {colorize(primary)}{'Pos':<4}{'Name':<20}{'SA':<4}{'GA':<4}{'SVS':<4}{'SV%':<7}{RESET}")
-        print(f"{colorize(secondary)}{"-" * 79}{RESET}")
+        print(f" {colorize(light)}{'Pos':<4}{'Name':<20}{'SA':<4}{'GA':<4}{'SVS':<4}{'SV%':<7}{RESET}")
+        print(f"{colorize(dark)}{"-" * 79}{RESET}")
         for goalie in sorted_goalies:
             print(f" {colorize(light)}{goalie.get('position', ''):<4}{goalie.get('name', ''):<20}{goalie.get('sa', 0):<4}{goalie.get('ga', 0):<4}{goalie.get('saves', 0):<4}{goalie.get('save_pctg', 0):<7.3f}{RESET}")
         
-        print(f"{colorize(secondary)}{"-" * 79}{RESET}")
+        print(f"{colorize(dark)}{"-" * 79}{RESET}")
         choice = input(f"Sort By: (n)ame, (p)oints, (+/-), (pim), (toi), (fow), (x)toggle team (q)uit: ").lower()
         match choice:
             case 'n':
@@ -165,11 +165,11 @@ def game_view_tui(game_number):
     data = view_boxscore(game_number)
     while True:
         subprocess.run(["clear"])
-        home_primary, home_secondary, home_accent, home_dark, home_light = get_colors(data.get('home_team_abbrev'), 5)
-        away_primary, away_secondary, away_accent, away_dark, away_light = get_colors(data.get('away_team_abbrev'), 5)
+        home_light, home_dark, home_accent = get_colors(data.get('home_team_abbrev'), 3)
+        away_light, away_dark, away_accent = get_colors(data.get('away_team_abbrev'), 3)
         print(f"{data.get('game_date')} | {data.get('game_state')} | ID: {data.get('game_id')}")
-        print(f"{colorize(away_primary)}{data.get('away_team_location'):^14}{RESET} {"@":^4} {colorize(home_primary)}{data.get('home_team_location'):^14}{RESET}")
-        print(f"{colorize(away_secondary)}{data.get('away_team_name'):^14}{RESET} {" ":^4} {colorize(home_secondary)}{data.get('home_team_name'):^14}{RESET}")
+        print(f"{colorize(away_light)}{data.get('away_team_location'):^14}{RESET} {"@":^4} {colorize(home_light)}{data.get('home_team_location'):^14}{RESET}")
+        print(f"{colorize(away_dark)}{data.get('away_team_name'):^14}{RESET} {" ":^4} {colorize(home_dark)}{data.get('home_team_name'):^14}{RESET}")
         print(f"{colorize(away_accent)}{data.get('away_score'):^14}{RESET} {" ":^4} {colorize(home_accent)}{data.get('home_score'):^14}{RESET}")
         print(f"SOG: {data.get('home_sog'):^4} {" ":^9} {data.get('away_sog'):^14}")
         print(f"Period: {data.get('period')} | {data.get('time_remaining')} | {data.get('home_pp_status')} | {data.get('away_pp_status')}")
