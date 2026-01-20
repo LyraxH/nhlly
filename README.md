@@ -49,6 +49,10 @@
 
 
 ### Change Log
+20-01: leafs lose
+   Implemented at a glance game view
+   Implemented player stats view
+   Implemented team stats view
 19-01:
    Implemented usage of colors with an SQL database to hold all team info
    Changed the projects structure by compartmentalizing the code into different files
