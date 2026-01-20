@@ -10,7 +10,7 @@ def view_boxscore(game_number):
     home_team = data.get('homeTeam', {})
     away_team = data.get('awayTeam', {})
     player_stats = data.get('playerByGameStats', '')
-    return {
+    game_data = {
         'game_state': data.get('gameState'), #what happening
         'game_id': data.get('id'), #game id
         'season': data.get('season'), #season 2025 2026
@@ -33,10 +33,13 @@ def view_boxscore(game_number):
         'away_pp_status': data.get('situation', {}).get('awayTeam', {}).get('situationDescriptions', 'N/A'),
         'venue': data.get('venue', {}).get('default', ''), #stadium name
         'venue_location': data.get('venueLocation', {}).get('default', ''), #stadium location
-
-        'home': get_team_stats(player_stats.get('homeTeam', '')),
-        'away': get_team_stats(player_stats.get('awayTeam', '')),
     }
+    if player_stats:
+        game_data.update({
+            'home': get_team_stats(player_stats.get('homeTeam', '')),
+            'away': get_team_stats(player_stats.get('awayTeam', '')),
+        })
+    return game_data
 
 def get_team_stats(team_stats):
     team = {'forwards': [], 'defense': [], 'goalies': []}
@@ -55,7 +58,7 @@ def get_player_stats(player):
         'name': player.get('name', {}).get('default', 'S. John'), #john smith lmao
         'position': player.get('position', ''),
     }
-    if (player.get('positon', '') == 'G'):
+    if (player.get('position', '') == "G"):
         stats.update({
             'essa': player.get('evenStrengthShotsAgainst', 0),
             'ppsa': player.get('powerPlayShotsAgainst', 0),
@@ -65,6 +68,7 @@ def get_player_stats(player):
             'esga': player.get('evenStrengthGoalsAgainst', 0),
             'ppga': player.get('powerPlayGoalsAgainst', 0),
             'shga': player.get('shortHandedGoalsAgainst', 0),
+            'sa': player.get('shotsAgainst', 0),
             'ga': player.get('goalsAgainst', 0),
             'saves': player.get('saves', 0)
         })
@@ -100,49 +104,51 @@ def stats_tui(home, away, h_tag, a_tag):
     toggle_tag = h_tag
     forward_sort_by = "name"
     defense_sort_by = "name"
-    goalie_sort_by = "name"
-    primary, secondary, accent, light, dark = get_colors(toggle_tag, 5)
     while True:
         subprocess.run(["clear"])
-        print(f" --- team roster {toggle_tag} --- Sort By: {forward_sort_by}")
-        print(f"{"-" * 79}")
+        primary, secondary, accent, light, dark = get_colors(toggle_tag, 5)
         sorted_forwards = sorted(toggle_team.get('forwards', []), key=lambda x: x[forward_sort_by], reverse=True)
         sorted_defense = sorted(toggle_team.get('defense', []), key=lambda x: x[defense_sort_by], reverse=True)
-        sorted_goalies = sorted(toggle_team.get('goalies', []), key=lambda x: x[goalie_sort_by], reverse=True)
+        sorted_goalies = sorted(toggle_team.get('goalies', []), key=lambda x: x['save_pctg'], reverse=True)
 
-        print(f"{'Pos':<3} {'Name':<16} {'G':<4} {'A':<4} {'P':<4} {'+/-':<5} {'PIM':<5} {'TOI':<5} {'FOW%':<10}\n{"-" * 79}")
+        print(f"{colorize(primary)}------ {colorize(accent)} {toggle_tag} {colorize(primary)} ------ {colorize(light)}\nSort By: {forward_sort_by}{RESET}")
+        print(f"{colorize(secondary)}{"-" * 79}{RESET}")
+
+        print(f" {colorize(primary)}{'Pos':<4}{'Name':<20}{'G':<4}{'A':<4}{'P':<4}{'+/-':<5}{'PIM':<5}{'TOI':<7}{'FOW%':<10}{RESET}")
+        print(f"{colorize(secondary)}{"-" * 79}{RESET}")
         for forward in sorted_forwards:
-            print(f" {forward.get('position', ''):<3} {forward.get('name', ''):<16} {forward.get('goals', 0):<4} {forward.get('assists', 0):<4} {forward.get('points', 0):<4} {forward.get('+/-', 0):<5} {forward.get('pim', 0):<5} {forward.get('toi', 0):<5} {forward.get('fow', 0):<10.2f}")
-        print(f"{"-" * 79}")
-        for defense in sorted_defense:
-            print(f" {defense.get('position', ''):<3} {defense.get('name', ''):<16} {defense.get('goals', 0):<4} {defense.get('assists', 0):<4} {defense.get('points', 0):<4} {defense.get('+/-', 0):<5} {defense.get('pim', 0):<5} {defense.get('toi', 0):<5} {defense.get('fow', 0):<10.2f}")
-        print(f"{"-" * 79}")
+            print(f" {colorize(light)}{forward.get('position', ''):<4}{forward.get('name', ''):<20}{forward.get('goals', 0):<4}{forward.get('assists', 0):<4}{forward.get('points', 0):<4}{forward.get('+/-', 0):<5}{forward.get('pim', 0):<5}{forward.get('toi', 0):<7}{forward.get('fow', 0):<10.2f}{RESET}")
+        
+        print(f"{colorize(secondary)}{"-" * 79}{RESET}")
 
-        print(f"{'Pos':<3} {'Name':<16} {'SV%':<10} {'GAA':<10}\n{"-" * 79}")
+        for defense in sorted_defense:
+            print(f" {colorize(light)}{defense.get('position', ''):<4}{defense.get('name', ''):<20}{defense.get('goals', 0):<4}{defense.get('assists', 0):<4}{defense.get('points', 0):<4}{defense.get('+/-', 0):<5}{defense.get('pim', 0):<5}{defense.get('toi', 0):<7}{defense.get('fow', 0):<10.2f}{RESET}")
+        
+        print(f"{colorize(secondary)}{"-" * 79}{RESET}")
+
+        print(f" {colorize(primary)}{'Pos':<4}{'Name':<20}{'SA':<4}{'GA':<4}{'SVS':<4}{'SV%':<7}{RESET}")
+        print(f"{colorize(secondary)}{"-" * 79}{RESET}")
         for goalie in sorted_goalies:
-            print(f" {goalie.get('position', ''):<3} {goalie.get('name', ''):<16} {goalie.get('save_pctg', 0):<10} {goalie.get('gaa', 0):<10}")
-        print(f"{"-" * 79}")
+            print(f" {colorize(light)}{goalie.get('position', ''):<4}{goalie.get('name', ''):<20}{goalie.get('sa', 0):<4}{goalie.get('ga', 0):<4}{goalie.get('saves', 0):<4}{goalie.get('save_pctg', 0):<7.3f}{RESET}")
+        
+        print(f"{colorize(secondary)}{"-" * 79}{RESET}")
         choice = input(f"Sort By: (n)ame, (p)oints, (+/-), (pim), (toi), (fow), (x)toggle team (q)uit: ").lower()
         match choice:
             case 'n':
                 forward_sort_by = 'name'
                 defense_sort_by = 'name'
-                goalie_sort_by = 'name'
             case '+':
                 forward_sort_by = '+/-'
                 defense_sort_by = '+/-'
-                goalie_sort_by = 'save_pctg'
             case 'pim':
                 forward_sort_by = 'pim'
                 defense_sort_by = 'pim'
             case 'toi':
                 forward_sort_by = 'toi'
                 defense_sort_by = 'toi'
-                goalie_sort_by = 'toi'
             case 'fow':
                 forward_sort_by = 'fow'
                 defense_sort_by = 'fow'
-                goalie_sort_by = 'gaa'
             case 'x':
                 if toggle_team == home:
                     toggle_team = away

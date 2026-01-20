@@ -39,8 +39,7 @@ def schedule_tui():
                 home = game.get('homeTeam', {}).get('abbrev', '')
                 away_color_primary = get_colors(away, 1)
                 home_color_primary = get_colors(home, 1)
-                print(f"{i}. {colorize(away_color_primary)}{away}{RESET} @ {colorize(home_color_primary)}{home}{RESET} - {state}") 
-                #add if game is currently going NOW with lightweight API
+                print(f"{i:>2}. {colorize(away_color_primary)}{away}{RESET} @ {colorize(home_color_primary)}{home}{RESET} - {state}")
         choice = input(f"{RESET}(y)esterday (t)omorrow (#)View Game (q)uit: ").lower()
         match choice:
             case 't':

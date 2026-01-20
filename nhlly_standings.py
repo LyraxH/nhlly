@@ -34,7 +34,7 @@ def standings_tui():
         subprocess.run(["clear"])
         standings = get_standings()
         standings_sorted = sorted(standings.items(), key=lambda x: x[1][sort_by], reverse = True)
-        print(f"--- Standings --- Sort By: {sort_by}")
+        print(f"--- Standings ---\nSort By: {sort_by}")
         print(f"{"Conference":<12}{"Division":<15}{"Team":<28}{"P":<4}{"W":<4}{"L":<4}{"OTL":<4}{"PCT":<4}")
         print("-" * 80)
         for name, stats in standings_sorted:

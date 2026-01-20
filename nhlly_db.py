@@ -9,10 +9,10 @@ def get_colors(tricode, color_num):
     path = "nhlly_data.db"
     with sqlite3.connect(path) as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT color_primary, color_secondary, color_accent, neutral_dark, neutral_light FROM colors WHERE tricode = ?", (tricode,))
+        cursor.execute("SELECT color_primary, color_secondary, color_accent, neutral_light, neutral_dark FROM colors WHERE tricode = ?", (tricode,))
         row = cursor.fetchone()
         if row:
-            primary, secondary, accent, neutral_dark, neutral_light = row
+            primary, secondary, accent, neutral_light, neutral_dark = row
             match color_num:
                 case 1:
                     return primary
@@ -21,9 +21,9 @@ def get_colors(tricode, color_num):
                 case 3:
                     return primary, secondary, accent
                 case 4:
-                    return primary, secondary, accent, neutral_dark
+                    return primary, secondary, accent, neutral_light
                 case 5:
-                    return primary, secondary, accent, neutral_dark, neutral_light
+                    return primary, secondary, accent, neutral_light, neutral_dark
         else:
             print(f"Error: No colors found for {tricode}")
             return None
