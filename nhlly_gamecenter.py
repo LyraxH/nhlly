@@ -95,14 +95,16 @@ def view_pbp(game_number):
     data = get_data(f"gamecenter/{game_number}/play-by-play")
     return {}
 
-def stats_tui(home, away):
+def stats_tui(home, away, h_tag, a_tag):
     toggle_team = home
+    toggle_tag = h_tag
     forward_sort_by = "name"
     defense_sort_by = "name"
     goalie_sort_by = "name"
+    primary, secondary, accent, light, dark = get_colors(toggle_tag, 5)
     while True:
         subprocess.run(["clear"])
-        print(f" --- team roster --- Sort By: {forward_sort_by}")
+        print(f" --- team roster {toggle_tag} --- Sort By: {forward_sort_by}")
         print(f"{"-" * 79}")
         sorted_forwards = sorted(toggle_team.get('forwards', []), key=lambda x: x[forward_sort_by], reverse=True)
         sorted_defense = sorted(toggle_team.get('defense', []), key=lambda x: x[defense_sort_by], reverse=True)
@@ -144,8 +146,10 @@ def stats_tui(home, away):
             case 'x':
                 if toggle_team == home:
                     toggle_team = away
+                    toggle_tag = a_tag
                 else:
                     toggle_team = home
+                    toggle_tag = h_tag
             case 'q':
                 break
             case _:
@@ -170,7 +174,7 @@ def game_view_tui(game_number):
                 break
             case 's':
                 #pull some stats b'y
-                stats_tui(data.get('home', {}), data.get('away', {}))
+                stats_tui(data.get('home', {}), data.get('away', {}), data.get('home_team_abbrev'), data.get('away_team_abbrev'))
             case 'p':
                 data = view_pbp(game_number)
             case _:
