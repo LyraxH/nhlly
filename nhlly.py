@@ -10,16 +10,14 @@ def main():
     """
     while True:
         subprocess.run(["clear"])
-        user_input = input("(st)andings (sc)hedule (t)eam (r)oster (q)uit \n what do: ").lower()
+        user_input = input("(s)andings (g)ames (r)oster (q)uit \n what do: ").lower()
         match user_input:
-            case 'st':
+            case 's':
                 standings_tui()
-            case 'sc':
+            case 'g':
                 schedule_tui()
             case 'r':
                 roster_tui()
-            case 't':
-                team_tui()
             case 'q':
                 break
             case _:
