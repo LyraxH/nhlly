@@ -95,7 +95,8 @@ def view_pbp(game_number):
     data = get_data(f"gamecenter/{game_number}/play-by-play")
     return {}
 
-def stats_tui(team):
+def stats_tui(home, away):
+    toggle_team = home
     forward_sort_by = "name"
     defense_sort_by = "name"
     goalie_sort_by = "name"
@@ -103,9 +104,9 @@ def stats_tui(team):
         subprocess.run(["clear"])
         print(f" --- team roster --- Sort By: {forward_sort_by}")
 
-        sorted_forwards = sorted(team.get('forwards', []), key=lambda x: x[forward_sort_by], reverse=True)
-        sorted_defense = sorted(team.get('defense', []), key=lambda x: x[defense_sort_by], reverse=True)
-        sorted_goalies = sorted(team.get('goalies', []), key=lambda x: x[goalie_sort_by], reverse=True)
+        sorted_forwards = sorted(toggle_team.get('forwards', []), key=lambda x: x[forward_sort_by], reverse=True)
+        sorted_defense = sorted(toggle_team.get('defense', []), key=lambda x: x[defense_sort_by], reverse=True)
+        sorted_goalies = sorted(toggle_team.get('goalies', []), key=lambda x: x[goalie_sort_by], reverse=True)
 
         print(f"{'Pos':<3} {'Name':<16} {'G':<4} {'A':<4} {'P':<4} {'+/-':<5} {'PIM':<5} {'TOI':<5} {'FOW%':<10}")
         print(f"{'-'}" * 79)
@@ -120,7 +121,7 @@ def stats_tui(team):
         for goalie in sorted_goalies:
             print(f" {goalie.get('position', ''):<3} {goalie.get('name', ''):<16} {goalie.get('save_pctg', 0):<10} {goalie.get('gaa', 0):<10}")
         print(f"{'-'}" * 79)
-        choice = input(f"Sort By: (n)ame, (g)ames, (p)oints, (+/-), (pim), (toi), (fow), (q)uit: ").lower()
+        choice = input(f"Sort By: (n)ame, (g)ames, (p)oints, (+/-), (pim), (toi), (fow), (x)toggle team (q)uit: ").lower()
         match choice:
             case 'n':
                 forward_sort_by = 'name'
@@ -138,6 +139,11 @@ def stats_tui(team):
                 forward_sort_by = 'fow'
                 defense_sort_by = 'fow'
                 goalie_sort_by = 'gaa'
+            case 'x':
+                if toggle_team == home:
+                    toggle_team = away
+                else:
+                    toggle_team = home
             case 'q':
                 break
             case _:
@@ -162,7 +168,7 @@ def game_view_tui(game_number):
                 break
             case 's':
                 #pull some stats b'y
-                stats_tui(data.get('home', {}))
+                stats_tui(data.get('home', {}), data.get('away', {}))
             case 'p':
                 data = view_pbp(game_number)
             case _:
