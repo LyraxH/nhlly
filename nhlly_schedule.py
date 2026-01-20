@@ -1,5 +1,5 @@
 import subprocess
-from datetime import datetime, timedelta # Essential for date math
+from datetime import datetime, timedelta
 from nhlly_api_client import get_data
 from nhlly_db import get_colors, colorize, RESET
 from nhlly_gamecenter import game_view_tui
@@ -50,6 +50,5 @@ def schedule_tui():
                 break
             case x if x in game_info: #advanced stats
                 game_view_tui(game_info[x])
-                break
             case _:
                 print("Invalid input")
