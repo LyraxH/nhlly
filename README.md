@@ -53,6 +53,7 @@
    Implemented at a glance game view
    Implemented player stats view
    Implemented team stats view
+   Added ability to toggle which team is being viewed during at a glance game view
 19-01:
    Implemented usage of colors with an SQL database to hold all team info
    Changed the projects structure by compartmentalizing the code into different files
