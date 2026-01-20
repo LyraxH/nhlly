@@ -42,7 +42,7 @@ def get_goalies(team_abbrev) -> dict | None:
             'losses': player.get('losses'),
             'otl': player.get('overtimeLosses'),
             'shutouts': player.get('shutouts'),
-            'sv': player.get('savePercentage'),
+            'save_pctg': player.get('savePercentage'),
             'gaa': player.get('goalsAgainstAverage')
         }
         for player in data.get('goalies', [])
@@ -69,7 +69,7 @@ def roster_tui():
         print(f" {'Pos':<3} {'First Name':<10} {'Last Name':<13} {'GP':<4} {'W':<4} {'L':<4} {'OTL':<4} {'SO':<4} {'SV%':<10} {'GAA':<10}")
         print(f"{colorize(color_secondary)}-{colorize(neutral_light)}" * 79)
         for name, stats in sorted_goalies:
-            print(f" {"G":<3} {stats['first_name']:<10} {name:<13} {stats['games']:<4} {stats['wins']:<4} {stats['losses']:<4} {stats['otl']:<4} {stats['shutouts']:<4} {stats['sv']:<10} {stats['gaa']:<10}")
+            print(f" {"G":<3} {stats['first_name']:<10} {name:<13} {stats['games']:<4} {stats['wins']:<4} {stats['losses']:<4} {stats['otl']:<4} {stats['shutouts']:<4} {stats['save_pctg']:<10} {stats['gaa']:<10}")
         choice = input(f"{RESET}Sort By: (f)irst name, (g)ames, (p)oints, (+/-), (pim), (toi), (fow), (q)uit: ").lower()
         match choice:
             case 'f':
