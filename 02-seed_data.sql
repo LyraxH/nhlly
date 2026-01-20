@@ -35,12 +35,12 @@ INSERT OR REPLACE INTO colors (tricode, team_name, color_primary, color_secondar
 
 -- division/playoff colors
 INSERT OR REPLACE INTO colors (tricode, team_name, color_primary, color_secondary, color_accent, neutral_dark, neutral_light) VALUES
-('EST', 'Eastern Conference', '#003087', '#A2AAAD', '#FFFFFF', '#000000', '#FFFFFF'),
-('WST', 'Western Conference', '#C8102E', '#DDCBA4', '#FFFFFF', '#000000', '#FFFFFF'),
-('ATL', 'Atlantic Division', '#00205B', '#FFB81C', '#FFFFFF', '#000000', '#FFFFFF'),
-('MET', 'Metropolitan Division', '#0038A8', '#CE1126', '#FFFFFF', '#000000', '#FFFFFF'),
-('CEN', 'Central Division', '#6F263D', '#236192', '#FFFFFF', '#000000', '#FFFFFF'),
-('PAC', 'Pacific Division', '#006847', '#F47A38', '#FFFFFF', '#000000', '#FFFFFF'),
+('E', 'Eastern Conference', '#003087', '#A2AAAD', '#FFFFFF', '#000000', '#FFFFFF'),
+('W', 'Western Conference', '#C8102E', '#DDCBA4', '#FFFFFF', '#000000', '#FFFFFF'),
+('A', 'Atlantic Division', '#00205B', '#FFB81C', '#FFFFFF', '#000000', '#FFFFFF'),
+('M', 'Metropolitan Division', '#0038A8', '#CE1126', '#FFFFFF', '#000000', '#FFFFFF'),
+('C', 'Central Division', '#6F263D', '#236192', '#FFFFFF', '#000000', '#FFFFFF'),
+('P', 'Pacific Division', '#006847', '#F47A38', '#FFFFFF', '#000000', '#FFFFFF'),
 ('CLI', 'Clinched Playoff Spot', '#2ECC71', '#1E8449', '#FFFFFF', '#000000', '#FFFFFF'),
 ('WLD', 'Wild Card Spot', '#F1C40F', '#B7950B', '#FFFFFF', '#000000', '#FFFFFF'),
 ('ITH', 'In the Hunt', '#A2AAAD', '#7B7D7D', '#FFFFFF', '#000000', '#FFFFFF'),
