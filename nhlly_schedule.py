@@ -17,12 +17,8 @@ def get_schedule(date_str):
         'date': day.get('date'),
         'dayAbbrev': day.get('dayAbbrev'),
         'games': day.get('games', []),
-        'game_id': game_id
+        'game_id': game_id,
     }
-
-def check_live(game_id):
-    data = get_data(f"gamecenter/{game_id}/landing")
-    return data.get('gameState')
 
 def schedule_tui():
     current_date = datetime.now()
@@ -37,12 +33,13 @@ def schedule_tui():
             game_info = {}
             for i, game in enumerate(schedule['games'], start=1):
                 game_id = game.get('id')
+                state = game.get('gameState', '')
                 game_info[str(i)] = game_id
                 away = game.get('awayTeam', {}).get('abbrev', '')
                 home = game.get('homeTeam', {}).get('abbrev', '')
                 away_color_primary = get_colors(away, 1)
                 home_color_primary = get_colors(home, 1)
-                print(f"{i}. {colorize(away_color_primary)}{away}{RESET} @ {colorize(home_color_primary)}{home}{RESET}") #{check_live(game_id)}
+                print(f"{i}. {colorize(away_color_primary)}{away}{RESET} @ {colorize(home_color_primary)}{home}{RESET} - {state}") 
                 #add if game is currently going NOW with lightweight API
         choice = input(f"{RESET}(y)esterday (t)omorrow (#)View Game (q)uit: ").lower()
         match choice:
