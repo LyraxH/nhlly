@@ -24,14 +24,14 @@ def get_skater_stats(player):
         'assists': player.get('assists', 0),
         'points': player.get('points', 0),
         '+/-': player.get('plusMinus', 0),
-        'pim': player.get('pim', 0),
+        'pim': player.get('penaltyMinutes', 0),
         'ppg': player.get('powerPlayGoals', 0),
         'shg': player.get('shortHandedGoals', 0),
         'gwg': player.get('gameWinningGoals', 0),
         'otg': player.get('overtimeGoals', 0),
         'sog': player.get('shotsOnGoal', 0),
-        'toi': player.get('timeOnIce', 0),
-        'fow': player.get('faceoffWinningPctg', 0),
+        'toi': player.get('avgTimeOnIcePerGame', 0),
+        'fow': player.get('faceoffWinPctg', 0),
     }
 
 def get_goalie_stats(player):
@@ -60,20 +60,20 @@ def roster_tui():
         subprocess.run(["clear"])
         light, dark, accent = get_colors(team_abbrev, 3)
         print(f"{colorize(light)}------ {colorize(accent)} {team_abbrev} {colorize(light)} ------ {colorize(dark)}\nSort By: {skater_sort_by}{RESET}")      
-        print(f"{colorize(dark)}{"-" * 79}{RESET}")
-        print(f" {colorize(light)}{'Pos':<4}{'Name':<23}{'GP':<4}{'G':<4}{'A':<4}{'P':<4}{'+/-':<5}{'PIM':<5}{'TOI':<7}{'FOW%':<10}{RESET}")
-        print(f"{colorize(dark)}{"-" * 79}{RESET}")
+        print(f"{colorize(dark)}{"-" * 90}{RESET}")
+        print(f" {colorize(light)}{'Pos':<4}{'Name':<24}{'GP':<4}{'G':<4}{'A':<4}{'P':<4}{'+/-':<4}{'PIM':<4}{'PPG':<4}{'SHG':<4}{'GWG':<4}{'OTG':<4}{'SOG':<4}{'TOI':<7}{'FOW%':<10}{RESET}")
+        print(f"{colorize(dark)}{"-" * 90}{RESET}")
         for forward in sorted_forwards:
-            print(f" {colorize(light)}{forward.get('position', ''):<4}{forward.get('first_name', ''):<10}{forward.get('last_name', ''):<13}{forward.get('gp', 0):<4}{forward.get('goals', 0):<4}{forward.get('assists', 0):<4}{forward.get('points', 0):<4}{forward.get('+/-', 0):<5}{forward.get('pim', 0):<5}{forward.get('toi', 0):<7}{forward.get('fow', 0):<10.2f}{RESET}")
-        print(f"{colorize(dark)}{"-" * 79}{RESET}")
+            print(f" {colorize(light)}{forward.get('position', ''):<4}{forward.get('first_name', ''):<10}{forward.get('last_name', ''):<14}{forward.get('gp', 0):<4}{forward.get('goals', 0):<4}{forward.get('assists', 0):<4}{forward.get('points', 0):<4}{forward.get('+/-', 0):<4}{forward.get('pim', 0):<4}{forward.get('ppg', 0):<4}{forward.get('shg', 0):<4}{forward.get('gwg', 0):<4}{forward.get('otg', 0):<4}{forward.get('sog', 0):<4}{(forward.get('toi', 0)/60):<7.2f}{forward.get('fow', 0):<10.2f}{RESET}")
+        print(f"{colorize(dark)}{"-" * 90}{RESET}")
         for defense in sorted_defense:
-            print(f" {colorize(light)}{defense.get('position', ''):<4}{defense.get('first_name', ''):<10}{defense.get('last_name', ''):<13}{defense.get('gp', 0):<4}{defense.get('goals', 0):<4}{defense.get('assists', 0):<4}{defense.get('points', 0):<4}{defense.get('+/-', 0):<5}{defense.get('pim', 0):<5}{defense.get('toi', 0):<7}{defense.get('fow', 0):<10.2f}{RESET}")
-        print(f"{colorize(dark)}{"-" * 79}{RESET}")
-        print(f" {colorize(light)}{'Pos':<4}{'Name':<23}{'GP':<4}{'W':<4}{'L':<4}{'OTL':<4}{'SO':<4}{'SV%':<7}{RESET}")
-        print(f"{colorize(dark)}{"-" * 79}{RESET}")
+            print(f" {colorize(light)}{defense.get('position', ''):<4}{defense.get('first_name', ''):<10}{defense.get('last_name', ''):<14}{defense.get('gp', 0):<4}{defense.get('goals', 0):<4}{defense.get('assists', 0):<4}{defense.get('points', 0):<4}{defense.get('+/-', 0):<4}{defense.get('pim', 0):<4}{defense.get('ppg', 0):<4}{defense.get('shg', 0):<4}{defense.get('gwg', 0):<4}{defense.get('otg', 0):<4}{defense.get('sog', 0):<4}{(defense.get('toi', 0)/60):<7.2f}{RESET}")
+        print(f"{colorize(dark)}{"-" * 90}{RESET}")
+        print(f" {colorize(light)}{'Pos':<4}{'Name':<24}{'GP':<4}{'W':<4}{'L':<4}{'OTL':<4}{'SO':<4}{'SV%':<7}{RESET}")
+        print(f"{colorize(dark)}{"-" * 90}{RESET}")
         for goalie in sorted_goalies:
-            print(f" {colorize(light)}{"G":<4}{goalie.get('first_name', ''):<10}{goalie.get('last_name', ''):<13}{goalie.get('gp', 0):<4}{goalie.get('wins', 0):<4}{goalie.get('losses', 0):<4}{goalie.get('otl', 0):<4}{goalie.get('shutouts', 0):<4}{goalie.get('save_pctg', 0):<7.3f}{RESET}")
-        print(f"{colorize(dark)}{"-" * 79}{RESET}")
+            print(f" {colorize(light)}{"G":<4}{goalie.get('first_name', ''):<10}{goalie.get('last_name', ''):<14}{goalie.get('gp', 0):<4}{goalie.get('wins', 0):<4}{goalie.get('losses', 0):<4}{goalie.get('otl', 0):<4}{goalie.get('shutouts', 0):<4}{goalie.get('save_pctg', 0):<7.3f}{RESET}")
+        print(f"{colorize(dark)}{"-" * 90}{RESET}")
         choice = input(f"{RESET}Sort By: (f)irst name, (g)ames, (p)oints, (+/-), (pim), (toi), (fow), (q)uit: ").lower()
         match choice:
             case 'f':
