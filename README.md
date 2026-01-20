@@ -33,6 +33,7 @@
 - [ ] Add a basic player info sheet
 - [ ] Add a player stats sheet
 #### Teams
+- [ ] Add a way to find upcoming games for a certain team
 - [ ] Add team info sheet (fun facts maybe? LMAO)
 - [ ] Add team schedule
 - [ ] Add ability to access team roster (to roster page)
@@ -41,7 +42,6 @@
 - [ ] Add way to search for teams
 - [ ] Add way to search for games
 #### Games
-- [ ] Add a way to find upcoming games for a certain team
 - [ ] Maybe even ways to find individual stats from certain games
 #### General
 - [ ] Add a help menu

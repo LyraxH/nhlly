@@ -47,7 +47,7 @@ def standings_tui():
                     light, dark, accent = get_colors(stats['conf_abbrev'], 3)
                 case "playoffs":
                     light, dark, accent = get_colors("CLI", 3)
-            print(f"{stats['conf']:<12}{stats['div']:<15}{colorize(light)}{stats['team_abbrev']:<6}{RESET}{colorize(dark)}{name:<22}{RESET}{stats['points']:<4}{stats['wins']:<4}{stats['losses']:<4}{stats['otl']:<4}{stats['win_pctg']:<4.2f}")
+            print(f"{stats['conf']:<12}{stats['div']:<15}{colorize(light)}{stats['team_abbrev']:<6}{colorize(dark)}{name:<22}{colorize(light)}{stats['points']:<4}{stats['wins']:<4}{stats['losses']:<4}{stats['otl']:<4}{stats['win_pctg']:<4.2f}{RESET}")
         choice = input("Sort By: (p)oints, (c)onference, (d)ivision, (p)layoffs, (n)ame, (q)uit: ").lower()
         match choice:
             case 'p':
