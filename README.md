@@ -46,6 +46,9 @@
 
 
 ### Change Log
+21-01:
+   Fixed more roster directory issues and linked to stats
+   spent most of the day trying to merge get_skater methods in gamecenter and rosters. they use differnet json formatting but i thought i could.. maybe ill try again. see: new branch
 20-01: leafs lose
    Implemented at a glance game view
    Implemented player stats view
