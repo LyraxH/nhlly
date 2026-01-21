@@ -1,20 +1,25 @@
 import subprocess
-from nhlly_api_client import get_data
+from nhlly_utils import get_data, draw_table
 from nhlly_db import get_colors, colorize, RESET
+    
+def view_pbp(game_number):
+    """
+    Fetches play-by-play stats for a game, used for the most advanced set of plays
+    """
+    data = get_data(f"gamecenter/{game_number}/play-by-play")
+    return {}
 
-def view_boxscore(game_number):
-    """
-    Fetches boxscore stats for a game, used for fetching more stats about a specific game
-    """
-    data = get_data(f"gamecenter/{game_number}/boxscore")
+def game_ataglance_tui(game_number):
+    data = get_data(f"gamecenter/{game_number}/landing")
     home_team = data.get('homeTeam', {})
     away_team = data.get('awayTeam', {})
-    player_stats = data.get('playerByGameStats', '')
     game_data = {
-        'game_state': data.get('gameState'), #what happening
         'game_id': data.get('id'), #game id
         'season': data.get('season'), #season 2025 2026
         'game_date': data.get('gameDate'), #date of game
+        'venue': data.get('venue', {}).get('default', ''), #stadium name
+        'venue_location': data.get('venueLocation', {}).get('default', ''), #stadium location
+        'game_state': data.get('gameState'), #what happening
         'home_team_location': home_team.get('placeName', '').get('default', ''), #Winnipeg
         'away_team_location': away_team.get('placeName', '').get('default', ''), #Toronto
         'home_team_name': home_team.get('commonName', '').get('default', ''), #Jets
@@ -26,117 +31,59 @@ def view_boxscore(game_number):
         'home_sog': home_team.get('sog', 0), #home shots on goal
         'away_sog': away_team.get('sog', 0), #away shots on goal
         'period': data.get('periodDescriptor', {}).get('number', 0), #period
+        'period_type': data.get('periodDescriptor', {}).get('periodType', 'N/A'),
         'time_remaining': data.get('clock', {}).get('timeRemaining', '69:420'), #time remaining
         'pp_home': data.get('situation', {}).get('homeTeam', {}).get('strength', 0), #power play
         'pp_away': data.get('situation', {}).get('awayTeam', {}).get('strength', 0), #power play
         'home_pp_status': data.get('situation', {}).get('homeTeam', {}).get('situationDescriptions', 'N/A'),
         'away_pp_status': data.get('situation', {}).get('awayTeam', {}).get('situationDescriptions', 'N/A'),
-        'venue': data.get('venue', {}).get('default', ''), #stadium name
-        'venue_location': data.get('venueLocation', {}).get('default', ''), #stadium location
     }
-    if player_stats:
-        game_data.update({
-            'home': get_team_stats(player_stats.get('homeTeam', '')),
-            'away': get_team_stats(player_stats.get('awayTeam', '')),
-        })
-    return game_data
-
-def get_team_stats(team_stats):
-    team = {'forwards': [], 'defense': [], 'goalies': []}
-    for player in team_stats.get('forwards', []):
-        team['forwards'].append(get_player_stats(player))
-    for player in team_stats.get('defense', []):
-        team['defense'].append(get_player_stats(player))
-    for player in team_stats.get('goalies', []):
-        team['goalies'].append(get_player_stats(player))
-    return team
-
-def get_player_stats(player):
-    stats = {
-        'player_id': player.get('playerId', ''),
-        'number': player.get('sweaterNumber', 0),
-        'name': player.get('name', {}).get('default', 'S. John'), #john smith lmao
-        'position': player.get('position', ''),
-    }
-    if (player.get('position', '') == "G"):
-        stats.update({
-            'essa': player.get('evenStrengthShotsAgainst', 0),
-            'ppsa': player.get('powerPlayShotsAgainst', 0),
-            'shsa': player.get('shortHandedShotsAgainst', 0),
-            'ssa': player.get('saveShotsAgainst', 0),
-            'save_pctg': player.get('savePctg', 0),
-            'esga': player.get('evenStrengthGoalsAgainst', 0),
-            'ppga': player.get('powerPlayGoalsAgainst', 0),
-            'shga': player.get('shortHandedGoalsAgainst', 0),
-            'sa': player.get('shotsAgainst', 0),
-            'ga': player.get('goalsAgainst', 0),
-            'saves': player.get('saves', 0)
-        })
-    else: #forwards and defense
-        stats.update({
-            'goals': player.get('goals', 0),
-            'assists': player.get('assists', 0),
-            'points': player.get('points', 0),
-            '+/-': player.get('plusMinus', 0),
-            'pim': player.get('pim', 0),
-            'hits': player.get('hits', 0),
-            'ppg': player.get('powerPlayGoals', 0),
-            'sog': player.get('sog', 0),
-            'fow': player.get('faceoffWinningPctg', 0),
-            'toi': player.get('toi', 0),
-            'blocks': player.get('blockedShots', 0),
-            'shifts': player.get('shifts', 0),
-            'giveaways': player.get('giveaways', 0),
-            'takeaways': player.get('takeaways', 0),
-        })
-    return stats
-
-    
-def view_pbp(game_number):
-    """
-    Fetches play-by-play stats for a game, used for the most advanced set of plays
-    """
-    data = get_data(f"gamecenter/{game_number}/play-by-play")
-    return {}
-
-def stats_tui(home, away, h_tag, a_tag):
-    toggle_team = home
-    toggle_tag = h_tag
-    forward_sort_by = "name"
-    defense_sort_by = "name"
     while True:
         subprocess.run(["clear"])
-        light, dark, accent = get_colors(toggle_tag, 3)
-        sorted_forwards = sorted(toggle_team.get('forwards', []), key=lambda x: x[forward_sort_by], reverse=True)
-        sorted_defense = sorted(toggle_team.get('defense', []), key=lambda x: x[defense_sort_by], reverse=True)
-        sorted_goalies = sorted(toggle_team.get('goalies', []), key=lambda x: x['save_pctg'], reverse=True)
+        home_light, home_dark, home_accent = get_colors(game_data.get('home_team_abbrev'), 3)
+        away_light, away_dark, away_accent = get_colors(game_data.get('away_team_abbrev'), 3)
+        print(f"{game_data.get('game_date')} | {game_data.get('game_state')} | ID: {game_data.get('game_id')}")
+        print(f"{colorize(away_light)}{game_data.get('away_team_location'):^14}{RESET} {"@":^4} {colorize(home_light)}{game_data.get('home_team_location'):^14}{RESET}")
+        print(f"{colorize(away_dark)}{game_data.get('away_team_name'):^14}{RESET} {" ":^4} {colorize(home_dark)}{game_data.get('home_team_name'):^14}{RESET}")
+        print(f"{colorize(away_accent)}{game_data.get('away_score'):^14}{RESET} {" ":^4} {colorize(home_accent)}{game_data.get('home_score'):^14}{RESET}")
+        print(f"SOG: {game_data.get('away_sog'):^4} {" ":^9} {game_data.get('home_sog'):^14}")
+        print(f"Period: {game_data.get('period')} | {game_data.get('time_remaining')} | {game_data.get('away_pp_status')} | {game_data.get('home_pp_status')}")
+        print(f"Venue: {game_data.get('venue')}, {game_data.get('venue_location')}")
+        choice = input("(p)lay by play (s)tats (q)uit: ").lower()
+        match choice:
+            case 'q':
+                break
+            case 's': #pull some stats b'y
+                stats_tui(game_data.get('home_team_abbrev'), game_data.get('away_team_abbrev'), game_data.get('game_id'))
+            case 'p':
+                data = view_pbp(game_data.get('game_id'))
+            case _:
+                print("Invalid input")
 
-        print(f"{colorize(light)}------ {colorize(accent)} {toggle_tag} {colorize(light)} ------ {colorize(dark)}\nSort By: {forward_sort_by}{RESET}")
-        print(f"{colorize(dark)}{"-" * 79}{RESET}")
-
-        print(f" {colorize(light)}{'Pos':<4}{'Name':<20}{'G':<4}{'A':<4}{'P':<4}{'+/-':<5}{'PIM':<5}{'TOI':<7}{'FOW%':<10}{RESET}")
-        print(f"{colorize(dark)}{"-" * 79}{RESET}")
-        for forward in sorted_forwards:
-            print(f" {colorize(light)}{forward.get('position', ''):<4}{forward.get('name', ''):<20}{forward.get('goals', 0):<4}{forward.get('assists', 0):<4}{forward.get('points', 0):<4}{forward.get('+/-', 0):<5}{forward.get('pim', 0):<5}{forward.get('toi', 0):<7}{forward.get('fow', 0):<10.2f}{RESET}")
-        
-        print(f"{colorize(dark)}{"-" * 79}{RESET}")
-
-        for defense in sorted_defense:
-            print(f" {colorize(light)}{defense.get('position', ''):<4}{defense.get('name', ''):<20}{defense.get('goals', 0):<4}{defense.get('assists', 0):<4}{defense.get('points', 0):<4}{defense.get('+/-', 0):<5}{defense.get('pim', 0):<5}{defense.get('toi', 0):<7}{defense.get('fow', 0):<10.2f}{RESET}")
-        
-        print(f"{colorize(dark)}{"-" * 79}{RESET}")
-
-        print(f" {colorize(light)}{'Pos':<4}{'Name':<20}{'SA':<4}{'GA':<4}{'SVS':<4}{'SV%':<7}{RESET}")
-        print(f"{colorize(dark)}{"-" * 79}{RESET}")
-        for goalie in sorted_goalies:
-            print(f" {colorize(light)}{goalie.get('position', ''):<4}{goalie.get('name', ''):<20}{goalie.get('sa', 0):<4}{goalie.get('ga', 0):<4}{goalie.get('saves', 0):<4}{goalie.get('save_pctg', 0):<7.3f}{RESET}")
-        
-        print(f"{colorize(dark)}{"-" * 79}{RESET}")
-        choice = input(f"Sort By: (n)ame, (p)oints, (+/-), (pim), (toi), (fow), (x)toggle team (q)uit: ").lower()
+def stats_tui(h_tag, a_tag, code=None):
+    toggle_tag = h_tag
+    skater_sort_by = "name"
+    goalie_sort_by = "name"
+    print(code)
+    while True:
+        if toggle_tag == h_tag:
+            draw_table(code, skater_sort_by, goalie_sort_by, 'homeTeam')
+        else:
+            draw_table(code, skater_sort_by, goalie_sort_by, 'awayTeam')
+        choice = input(f"Sort By: (n)ame, (g)oals, (a)ssists, (p)oints, (+/-), (pim), (toi), (fow), (s)hots, (x)toggle team (q)uit: ").lower()
         match choice:
             case 'n':
                 forward_sort_by = 'name'
                 defense_sort_by = 'name'
+            case 'g':
+                forward_sort_by = 'goals'
+                defense_sort_by = 'goals'
+            case 'a':
+                forward_sort_by = 'assists'
+                defense_sort_by = 'assists'
+            case 'p':
+                forward_sort_by = 'points'
+                defense_sort_by = 'points'
             case '+':
                 forward_sort_by = '+/-'
                 defense_sort_by = '+/-'
@@ -149,6 +96,9 @@ def stats_tui(home, away, h_tag, a_tag):
             case 'fow':
                 forward_sort_by = 'fow'
                 defense_sort_by = 'fow'
+            case 's':
+                forward_sort_by = 'sog'
+                defense_sort_by = 'sog'
             case 'x':
                 if toggle_team == home:
                     toggle_team = away
@@ -158,30 +108,5 @@ def stats_tui(home, away, h_tag, a_tag):
                     toggle_tag = h_tag
             case 'q':
                 break
-            case _:
-                print("Invalid input")
-
-def game_view_tui(game_number):
-    data = view_boxscore(game_number)
-    while True:
-        subprocess.run(["clear"])
-        home_light, home_dark, home_accent = get_colors(data.get('home_team_abbrev'), 3)
-        away_light, away_dark, away_accent = get_colors(data.get('away_team_abbrev'), 3)
-        print(f"{data.get('game_date')} | {data.get('game_state')} | ID: {data.get('game_id')}")
-        print(f"{colorize(away_light)}{data.get('away_team_location'):^14}{RESET} {"@":^4} {colorize(home_light)}{data.get('home_team_location'):^14}{RESET}")
-        print(f"{colorize(away_dark)}{data.get('away_team_name'):^14}{RESET} {" ":^4} {colorize(home_dark)}{data.get('home_team_name'):^14}{RESET}")
-        print(f"{colorize(away_accent)}{data.get('away_score'):^14}{RESET} {" ":^4} {colorize(home_accent)}{data.get('home_score'):^14}{RESET}")
-        print(f"SOG: {data.get('home_sog'):^4} {" ":^9} {data.get('away_sog'):^14}")
-        print(f"Period: {data.get('period')} | {data.get('time_remaining')} | {data.get('home_pp_status')} | {data.get('away_pp_status')}")
-        print(f"Venue: {data.get('venue')}, {data.get('venue_location')}")
-        choice = input("(p)lay by play (s)tats (q)uit: ").lower()
-        match choice:
-            case 'q':
-                break
-            case 's':
-                #pull some stats b'y
-                stats_tui(data.get('home', {}), data.get('away', {}), data.get('home_team_abbrev'), data.get('away_team_abbrev'))
-            case 'p':
-                data = view_pbp(game_number)
             case _:
                 print("Invalid input")

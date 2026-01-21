@@ -1,5 +1,5 @@
 import subprocess
-from nhlly_api_client import get_data
+from nhlly_utils import get_data
 from nhlly_db import get_colors, colorize, RESET
 
 def get_standings() -> dict | None:

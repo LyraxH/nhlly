@@ -1,8 +1,8 @@
 import subprocess
 from datetime import datetime, timedelta
-from nhlly_api_client import get_data
+from nhlly_utils import get_data
 from nhlly_db import get_colors, colorize, RESET
-from nhlly_gamecenter import game_view_tui
+from nhlly_gamecenter import game_ataglance_tui
 
 def get_schedule(date_str):
     """
@@ -49,6 +49,6 @@ def schedule_tui():
             case 'q':
                 break
             case x if x in game_info: #advanced stats
-                game_view_tui(game_info[x])
+                game_ataglance_tui(game_info[x])
             case _:
                 print("Invalid input")
